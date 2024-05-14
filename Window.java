@@ -1,8 +1,8 @@
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Image;
 import java.awt.MouseInfo;
 import java.awt.Point;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -14,40 +14,72 @@ import javax.swing.JLabel;
 
 public class Window extends JFrame implements Runnable
 {
+	/**
+	 * Gets rid of the warning.
+	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Location of the right edge of the screen.
+	 */
 	double rightbound = 0;
 	
+	/**
+	 * Location of the left edge of the screen.
+	 */
 	double leftbound = 0;
 	
+	/**
+	 * Location of the top edge of the screen.
+	 */
 	double upbound = 0;
 	
+	/**
+	 * Location of the bottom edge of the screen.
+	 */
 	double downbound = 0;
 	
+	/**
+	 * Velocity of the window on the X axis.
+	 */
 	int XVel = 0;	
 	
+	/**
+	 * Velocity of the window on the Y axis.
+	 */
 	int YVel = 0;
 	
+	/**
+	 * Calculated velocity of the mouse.
+	 */
 	int MouseVel = 0;
 	
+	/**
+	 * Position of the mouse one cycle ago.
+	 */
 	Point OldMousePos = MouseInfo.getPointerInfo().getLocation();
 	
+	/**
+	 * Runs the function to update the position each millisecond.
+	 */
 	ScheduledExecutorService Controller = Executors.newScheduledThreadPool(1);
 	
+	/**
+	 * Default and only constructor. Calculates the monitor bounds.
+	 */
 	Window()
 	{
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
-		try 
-		{
-			JLabel Bug = new JLabel(new ImageIcon(new URL("https://media.tenor.com/E7uOu0_B1RYAAAAM/cockroach-spin.gif")));
+			URL url = Window.class.getResource("roach.gif");
+			
+			ImageIcon BugGif = new ImageIcon(url);
+			BugGif.setImage(BugGif.getImage().getScaledInstance(200, 200, Image.SCALE_DEFAULT));
+			
+			JLabel Bug = new JLabel(BugGif);
 			this.add(Bug);
-		} 
-		catch (MalformedURLException e) 
-		{
-			e.printStackTrace();
-		}
 		
+		this.setUndecorated(true);
 		this.pack();
 		this.setResizable(false);
 		this.setVisible(true);
@@ -86,6 +118,10 @@ public class Window extends JFrame implements Runnable
 	}
 
 	@Override
+	/**
+	 * Moves the window based on velocity and RNG.
+	 * Detects collisions with the mouse and monitor borders.
+	 */
 	public void run() 
 	{
 		int x = this.getLocation().x + ThreadLocalRandom.current().nextInt(-1, 2) + XVel/25;

@@ -50,9 +50,14 @@ public class Window extends JFrame implements Runnable
 	int YVel = 0;
 	
 	/**
-	 * Calculated velocity of the mouse.
+	 * Calculated velocity of the mouse on the X axis.
 	 */
-	int MouseVel = 0;
+	int MouseVelX = 0;
+	
+	/**
+	 * Calculated velocity of the mouse on the Y axis.
+	 */
+	int MouseVelY = 0;
 	
 	/**
 	 * Position of the mouse one cycle ago.
@@ -134,25 +139,26 @@ public class Window extends JFrame implements Runnable
 		
 		if(this.getLocation().x >= this.rightbound-this.getSize().width && this.XVel >= 0)
 		{
-			this.XVel = (int) (-XVel*0.99);
+			this.XVel = (int) (-XVel*0.97);
 		}
 		else if(this.getLocation().x <= -leftbound && this.XVel <= 0)
 		{
-			this.XVel = (int) (-XVel*0.99);
+			this.XVel = (int) (-XVel*0.97);
 		}
 		
 		if(this.getLocation().y >= this.upbound-this.getSize().height && this.YVel >= 0)
 		{
-			this.YVel = (int) (-YVel*0.99);
+			this.YVel = (int) (-YVel*0.97);
 		}
 		else if(this.getLocation().y <= -downbound && this.YVel <= 0)
 		{
-			this.YVel = (int) (-YVel*0.99);
+			this.YVel = (int) (-YVel*0.97);
 		}
 		
 		
 		Point MouseLocation = MouseInfo.getPointerInfo().getLocation();
-		MouseVel = (int) (MouseVel/1.05 + Math.abs(MouseLocation.x - OldMousePos.x) + Math.abs(MouseLocation.y - OldMousePos.y));
+		MouseVelX = (int) (MouseVelX/1.05 + (MouseLocation.x - OldMousePos.x));
+		MouseVelY = (int) (MouseVelY/1.05 + (MouseLocation.y - OldMousePos.y));
 		
 		x += this.getBounds().width/2;
 		y += this.getBounds().height/2;
@@ -162,20 +168,20 @@ public class Window extends JFrame implements Runnable
 		
 		if(this.XVel < 0 && relX < 0 && relX > -this.getBounds().width/2 && Math.abs(relY) < this.getBounds().height)
 		{
-			this.XVel = (int) (-XVel*0.99)+MouseVel;
+			this.XVel = (int) (-XVel*0.97)+MouseVelX;
 		}
 		else if(this.XVel > 0 && relX > 0 && relX < this.getBounds().width/2 && Math.abs(relY) < this.getBounds().height)
 		{
-			this.XVel = (int) (-XVel*0.99)+MouseVel;
+			this.XVel = (int) (-XVel*0.97)+MouseVelX;
 		}
 		
 		if(this.YVel < 0 && relY < 0 && relY > -this.getBounds().height/2 && Math.abs(relX) < this.getBounds().width)
 		{
-			this.YVel = (int) (-YVel*0.99)+MouseVel;
+			this.YVel = (int) (-YVel*0.97)+MouseVelY;
 		}
 		else if(this.YVel > 0 && relY > 0 && relY < this.getBounds().height/2 && Math.abs(relX) < this.getBounds().width)
 		{
-			this.YVel = (int) (-YVel*0.99)+MouseVel;
+			this.YVel = (int) (-YVel*0.97)+MouseVelY;
 		}
 		
 		

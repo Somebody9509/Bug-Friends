@@ -3,16 +3,22 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.MouseInfo;
 import java.awt.Point;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.net.URL;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.DataLine;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-public class Window extends JFrame implements Runnable
+public class Window extends JFrame implements Runnable, WindowListener
 {
 	/**
 	 * Gets rid of the warning.
@@ -74,9 +80,10 @@ public class Window extends JFrame implements Runnable
 	 */
 	Window()
 	{
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		this.addWindowListener(this);
 		
-			URL url = Window.class.getResource("roach.gif");
+			URL url = getClass().getResource("roach.gif");
 			
 			ImageIcon BugGif = new ImageIcon(url);
 			BugGif.setImage(BugGif.getImage().getScaledInstance(200, 200, Image.SCALE_DEFAULT));
@@ -169,22 +176,122 @@ public class Window extends JFrame implements Runnable
 		if(this.XVel < 0 && relX < 0 && relX > -this.getBounds().width/2 && Math.abs(relY) < this.getBounds().height)
 		{
 			this.XVel = (int) (-XVel*0.97)+MouseVelX;
+			this.YVel += MouseVelY;
 		}
 		else if(this.XVel > 0 && relX > 0 && relX < this.getBounds().width/2 && Math.abs(relY) < this.getBounds().height)
 		{
 			this.XVel = (int) (-XVel*0.97)+MouseVelX;
+			this.YVel += MouseVelY;
 		}
 		
 		if(this.YVel < 0 && relY < 0 && relY > -this.getBounds().height/2 && Math.abs(relX) < this.getBounds().width)
 		{
 			this.YVel = (int) (-YVel*0.97)+MouseVelY;
+			this.XVel += MouseVelX;
 		}
 		else if(this.YVel > 0 && relY > 0 && relY < this.getBounds().height/2 && Math.abs(relX) < this.getBounds().width)
 		{
 			this.YVel = (int) (-YVel*0.97)+MouseVelY;
+			this.XVel += MouseVelX;
 		}
 		
 		
 		OldMousePos = MouseLocation;
+	}
+
+	@Override
+	/**
+	 * Unused implemented method.
+	 */
+	public void windowActivated(WindowEvent arg0) 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	/**
+	 * Unused implemented method.
+	 */
+	public void windowClosed(WindowEvent arg0) 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	/**
+	 * Called when the user attempts to close the window.
+	 * Makes it go splat and exits the program.
+	 */
+	public void windowClosing(WindowEvent arg0) 
+	{
+		this.Controller.shutdown();
+		
+		try 
+		{
+			AudioInputStream Stream = AudioSystem.getAudioInputStream(getClass().getResource("splat.wav"));
+			DataLine.Info AudioInfo = new DataLine.Info(Clip.class, Stream.getFormat());
+			Clip AudioClip = (Clip) AudioSystem.getLine(AudioInfo);
+			AudioClip.open(Stream);
+			AudioClip.start();
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+			System.exit(1);
+		}
+		
+		try 
+		{
+			Thread.sleep(2000);
+		} 
+		catch (InterruptedException e) 
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+		System.exit(0);
+		}
+	}
+
+	@Override
+	/**
+	 * Unused implemented method.
+	 */
+	public void windowDeactivated(WindowEvent arg0) 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	/**
+	 * Unused implemented method.
+	 */
+	public void windowDeiconified(WindowEvent arg0) 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	/**
+	 * Unused implemented method.
+	 */
+	public void windowIconified(WindowEvent arg0) 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	/**
+	 * Unused implemented method.
+	 */
+	public void windowOpened(WindowEvent arg0) 
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

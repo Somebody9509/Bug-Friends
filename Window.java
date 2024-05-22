@@ -1,3 +1,4 @@
+import java.awt.CardLayout;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
@@ -17,6 +18,7 @@ import javax.sound.sampled.DataLine;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 public class Window extends JFrame implements Runnable, WindowListener
 {
@@ -66,6 +68,11 @@ public class Window extends JFrame implements Runnable, WindowListener
 	int MouseVelY = 0;
 	
 	/**
+	 * True when the program is closing.
+	 */
+	boolean shuttingDown = false;
+	
+	/**
 	 * Position of the mouse one cycle ago.
 	 */
 	Point OldMousePos = MouseInfo.getPointerInfo().getLocation();
@@ -74,6 +81,21 @@ public class Window extends JFrame implements Runnable, WindowListener
 	 * Runs the function to update the position each millisecond.
 	 */
 	ScheduledExecutorService Controller = Executors.newScheduledThreadPool(1);
+	
+	/**
+	 * The gif/image displayed on the window.
+	 */
+	ImageIcon BugGif;
+	
+	/**
+	 * The label to display the gif/image.
+	 */
+	JLabel Bug = new JLabel(BugGif);
+	
+	/**
+	 * The panel used to display the labe.
+	 */
+	JPanel MainPanel = new JPanel();
 	
 	/**
 	 * Default and only constructor. Calculates the monitor bounds.
@@ -85,11 +107,17 @@ public class Window extends JFrame implements Runnable, WindowListener
 		
 			URL url = getClass().getResource("roach.gif");
 			
-			ImageIcon BugGif = new ImageIcon(url);
+			BugGif = new ImageIcon(url);
 			BugGif.setImage(BugGif.getImage().getScaledInstance(200, 200, Image.SCALE_DEFAULT));
 			
-			JLabel Bug = new JLabel(BugGif);
-			this.add(Bug);
+			Bug = new JLabel();
+			Bug.setIcon(BugGif);
+			
+			MainPanel.setLayout(new CardLayout());
+			
+			MainPanel.add(Bug);
+			
+			this.add(MainPanel);
 		
 		this.setUndecorated(true);
 		this.pack();
@@ -136,6 +164,12 @@ public class Window extends JFrame implements Runnable, WindowListener
 	 */
 	public void run() 
 	{
+		if(shuttingDown)
+		{
+			System.exit(0);
+		}
+		
+		
 		int x = this.getLocation().x + ThreadLocalRandom.current().nextInt(-1, 2) + XVel/25;
 		int y = this.getLocation().y + ThreadLocalRandom.current().nextInt(-1, 2) + YVel/25;
 		
@@ -241,18 +275,15 @@ public class Window extends JFrame implements Runnable, WindowListener
 			System.exit(1);
 		}
 		
-		try 
-		{
-			Thread.sleep(2000);
-		} 
-		catch (InterruptedException e) 
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-		System.exit(0);
-		}
+		BugGif.setImage(BugGif.getImage().getScaledInstance(500, 75, Image.SCALE_DEFAULT));
+		Bug.setIcon(BugGif);
+		this.pack();
+		this.repaint();
+		
+		shuttingDown = true;
+		Controller = Executors.newScheduledThreadPool(1);
+		Controller.schedule(this, 3000, TimeUnit.MILLISECONDS);
+		//^^^ This code sucks
 	}
 
 	@Override
